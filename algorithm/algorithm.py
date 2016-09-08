@@ -1,87 +1,39 @@
-from math import *
+import sqlite3
+import csv
+import sys
 
-#Fill with the data received by the backend
-jutges = [
-    [{"app_id":"1", "score":"worse"},{"app_id":"2", "score":"better"},{"app_id":"3", "score":"better"},{"app_id":"4", "score":"better"},{"app_id":"5", "score":"better"}],
-    [{"app_id":"5", "score":"worse"},{"app_id":"4", "score":"worse"},{"app_id":"3", "score":"worse"},{"app_id":"2", "score":"worse"},{"app_id":"1", "score":"worse"}]
-]
+############# Number of people into this batch ##################
+batch_num = int(sys.argv[1])
 
-# List with all appids
-app_ids = []
+def utf_8_encoder(unicode_csv_data):
+    for line in unicode_csv_data:
+        yield line.encode('utf-8')
 
-for judge_votations in jutges:
-    for application in judge_votations:
-        if (application["app_id"] not in app_ids):
-            app_ids.append(application["app_id"])
+conn = sqlite3.connect('../backend/api/tmp/test.db')
+conn.row_factory = sqlite3.Row
 
-#Algorithm based on response:
-#http://stats.stackexchange.com/questions/83005/how-to-calculate-ratings-rankings-from-paired-comparison-pairwise-comparison-o
-#Count how many times each item is beaten by each other, store in matrix
-counter = {}
-total_comparisons = {}
-for app_id in app_ids:
-    if app_id not in total_comparisons:
-        total_comparisons[app_id] = {}
-        for app_id2 in app_ids:
-            if app_id2 not in total_comparisons[app_id]:
-                total_comparisons[app_id][app_id2] = 0
+judgements = []
 
+for appl in conn.execute('SELECT * FROM applications'):
+    app_id = appl["id"]
+    t = (app_id,)
+    count = 0
+    total_score = 0
+    for judgement in conn.execute('SELECT * FROM judgements WHERE app_id=?', t):
+        if judgement["rating"] == "better":
+            score = 1
+        else:
+            score = -2
+        count += 1
+        total_score += score
+        if count != 0:
+            avg = total_score/count
+        else:
+            avg = 0
+    judgements.append([app_id, avg, appl["name"].encode('utf-8'), appl["email"].encode('utf-8')])
 
-for judge_votations in jutges:
-    for i in range(1, len(judge_votations)):
-        #Start in 1 because the first comparison is the pair 0-1
-        app_id = judge_votations[i]["app_id"]
-        app_id_old = judge_votations[i - 1]["app_id"]
-        score = judge_votations[i]["score"]
+judgements = sorted(judgements, key=lambda judgement: -judgement[1])
 
-        #There is a comparison, store it
-        total_comparisons[app_id][app_id_old] += 1
-        total_comparisons[app_id_old][app_id] += 1
-        #The comparison is better, store it in the wins matrix
-        if score == "better" :
-            if app_id not in counter:
-                counter[app_id] = {}
-                counter[app_id][app_id_old] = 1
-            elif app_id_old not in counter[app_id]:
-                    counter[app_id][app_id_old] = 1
-            else :
-                counter[app_id][app_id_old] += 1
-
-#Now we have the matrix prepared, do the fun
-#init all gamma to 0
-gamma = {}
-for app_id in app_ids:
-    if (app_id not in gamma):
-        #Init gamma arbitratily
-        gamma[app_id] = 1
-
-iterations = 100000
-
-for it in range(0, iterations):
-    for app_id in app_ids:
-        total_wins = 0
-        if app_id in counter.keys():
-            total_wins = sum(counter[app_id].values())
-        sumatory = 0.0
-        for app_id2 in app_ids:
-            if (app_id != app_id2):
-                total_c = total_comparisons[app_id][app_id2] + total_comparisons[app_id2][app_id]
-                divisor = 1
-                if gamma[app_id] + gamma[app_id2] > 0.0:
-                    divisor = gamma[app_id] + gamma[app_id2]
-                sumatory = sumatory + (total_c / divisor)
-        gamma[app_id] = total_wins * (1 / sumatory)
-        #Now normalize gamma
-        mean = float(sum(gamma.values())) / max(len(gamma.values()), 1)
-        for key in gamma.keys():
-            gamma[key] = gamma[key] / mean
-
-def actualBatch(app_id):
-    #TODO
-    return True
-
-#Filter non batchable
-filtered = {k: v for k, v in gamma.items() if actualBatch(k)}
-
-#print result
-print(sorted(filtered, key=gamma.get, reverse=True))
+with open('accepted.csv', 'wb') as f:
+    writer = csv.writer(f)
+    writer.writerows(judgements[:batch_num])
