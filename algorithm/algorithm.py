@@ -30,10 +30,16 @@ for appl in conn.execute('SELECT * FROM applications'):
             avg = total_score/count
         else:
             avg = 0
-    judgements.append([app_id, avg, appl["name"].encode('utf-8'), appl["email"].encode('utf-8')])
+    if appl['state']=='tbd':
+        judgements.append([app_id, avg, appl["name"].encode('utf-8'), appl["email"].encode('utf-8')])
 
 judgements = sorted(judgements, key=lambda judgement: -judgement[1])
 
-with open('accepted.csv', 'wb') as f:
+batch = judgements[:batch_num]
+for accepted in batch:
+    conn.execute("UPDATE applications SET state='accepted' WHERE id=?",(accepted[0],))
+conn.commit()
+
+with open('batch.csv', 'wb') as f:
     writer = csv.writer(f)
     writer.writerows(judgements[:batch_num])
