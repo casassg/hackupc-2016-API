@@ -6,8 +6,8 @@
 	</header>
 	<div class="instructions" ng-if="firstTime">
 		<h3>Welcome to the Hackers Judge!</h3>
-		<p>Before start judging, please note that ratings are relative. This means you have to rate the current application as <span class="better">better</span> or <span class="worse">worse</span> than the last one you rated.</p>
-		<p>You can always check the application relative to the current one by clicking the top-right button.</p>
+		<p>Before start judging, please note that ratings are <span class="big">NOT</span> relative. This means you have to rate the current application as <span class="better">Good</span> or <span class="worse">Bad</span>. How you rated the previous application doesn't have any effect on the current one.</p>
+		<p>You can always check the application relative to the current one by clicking the top-right button <span class="big">FOR NO REASON</span>.</p>
 		<div class="ok" ng-click="gotIt()">Got it!</div>
 	</div>
 	<div class='application' ng-if="current.name && !firstTime">
