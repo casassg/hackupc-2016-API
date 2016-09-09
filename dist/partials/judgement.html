@@ -43,6 +43,7 @@
 			</tr>
 		</table>
 		<div class="misc">
+				<div class="nocode" ng-if="current.mlhAuthorization != '1'">DIDN'T ACCEPT THE CODE</div>
 				<div class="team" ng-if="current.applyingAsAteam == '1'">Team</div>
 				<div class="travel" ng-if="current.needTravelScholarship == '1'">Needs Travel</div>
 				<div class="newbie" ng-if="current.newbie == '1'">Newbie</div>
@@ -60,7 +61,7 @@
 	</div>
 	<footer class="judgementButtons" ng-if="current.name !== undefined && !firstTime">
 		<div class="worse" ng-click="worse()">&#10005;</div>
-		<div class="better" ng-click="better()">&#10003;</div>
+		<div class="better" ng-click="better()" ng-if="current.mlhAuthorization == '1'">&#10003;</div>
 	</footer>
 	<div class="empty" ng-if="current.name === undefined && !firstTime">
 		<h1>Good job! No more applications for you to judge...</h1>
