@@ -6,6 +6,7 @@ from typeform import getMoreResponses
 import hashlib
 from models.judge import Judge
 from models.application import Application
+import random
 from models.judgement import Judgement
 from models.db import db
 from sqlalchemy import desc, asc
@@ -74,39 +75,30 @@ def get_last_application():
 @asJSON
 def get_next_application():
     id = Judge.getJudgeIdByToken()
+    needs_new_judgement = True
+    app = None
 
-    judgement = Judgement.query \
-                         .filter_by(judge_id=id) \
-                         .order_by(desc(Judgement.judge_index)) \
-                         .first()
-
-    if (judgement is not None) and (judgement.rating == ''):
-        print "ayyyy"
-        app_id = judgement.app_id
+    #Get current application being judged
+    current = Judgement.getCurrentJudgementByJudgeId(id)
+    if current:
+        app_id = current.app_id
         app = Application.query.filter_by(id=app_id).first()
-    else:
-        if judgement is None:
-            first_app = Application.query.order_by(asc(Application.id)).first()
-            print first_app
-            next_app = first_app
-            new_app_id = next_app.id
-        else:
-            new_app_id = judgement.app_id + 1
-            next_app = Application.query.filter_by(id=new_app_id).first()
+        needs_new_judgement = app.state != 'tbd'
 
-        if next_app is not None:
-            newJudgement = Judgement(app_id=new_app_id, judge_id=id)
-            newJudgement.rating = ''
-            if judgement is None:
-                newJudgement.judge_index = 0
-            else:    
-                newJudgement.judge_index = judgement.judge_index + 1
-
-            db.session.add(newJudgement)
-            db.session.commit()
-            app = next_app
-        else:
-            app = None
+    if needs_new_judgement:
+        judge_judgements = Judgement.query.filter_by(judge_id=id).all()
+        apps_judged = set([judge_judgement.app_id for judge_judgement in judge_judgements])
+        apps_all = set([application[0] for application in Application.query.filter_by(state='tbd').values('id')])
+        apps_missing = apps_all - apps_judged
+        if not apps_missing:
+            return {'status':'everyone_judged'}
+        app_id = random.sample(apps_missing,1)[0]
+        newJudgement = Judgement(app_id=app_id, judge_id=id)
+        newJudgement.judge_index = len(judge_judgements)
+        newJudgement.rating = ''
+        db.session.add(newJudgement)
+        db.session.commit()
+        app = Application.query.filter_by(id=app_id).first()
 
     if app is not None:
         return app.to_dict()
