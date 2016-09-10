@@ -10,7 +10,7 @@
 		<p>You can always check the application relative to the current one by clicking the top-right button <span class="big">FOR NO REASON</span>.</p>
 		<div class="ok" ng-click="gotIt()">Got it!</div>
 	</div>
-	<div class='application' ng-if="current.name && !firstTime">
+	<div class='application' ng-if="current.status !== 'everyone_judged' && !firstTime">
 		
 		<div class="title" ng-if="current.name !== undefined">
 			<h1>{{current.name}} {{current.lastname}}</h1>
@@ -59,11 +59,11 @@
 			{{current.face}}
 		</div>
 	</div>
-	<footer class="judgementButtons" ng-if="current.name !== undefined && !firstTime">
+	<footer class="judgementButtons" ng-if="current.status !== 'everyone_judged' && !firstTime">
 		<div class="worse" ng-click="worse()">&#10005;</div>
 		<div class="better" ng-click="better()" ng-if="current.mlhAuthorization == '1'">&#10003;</div>
 	</footer>
-	<div class="empty" ng-if="current.name === undefined && !firstTime">
+	<div class="empty" ng-if="current.status == 'everyone_judged' && !firstTime">
 		<h1>Good job! No more applications for you to judge...</h1>
 		<h2>...for now. Please, come back later.</h2>
 	</div>
