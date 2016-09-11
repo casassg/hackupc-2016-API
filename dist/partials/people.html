@@ -7,23 +7,47 @@
 	<div class="view" ng-if="people.length > 0">
 		<div class="options" ng-class="{'closed': optClosed}">
 			<form>
+				<h3>Filters</h3>
 				<fieldset>
-					<h3>Filters</h3>
 					<input type="search" ng-model="f.query"/>
 					<div>
 						<label for="checknew">Newcomers</label>
 						<input id="checknew" type="checkbox" ng-model="f.onlyNewcomers"/>
 					</div>
 				</fieldset>
-				<fieldset>
-					<h3>Selectors</h3>
-					<label for="checktbd">TBD</label>
-					<input id="checktbd" type="checkbox" ng-model="f.tbd" />
-					<label for="checkrejected">Rejected</label>
-					<input id="checkrejected" type="checkbox" ng-model="f.rejected"/>
-					<label for="checkaccepted">Accepted</label>
-					<input id="checkaccepted" type="checkbox" ng-model="f.accepted"/>
-				</fieldset>
+				<h3>Selectors</h3>
+				<div class="group">
+					<div>
+						<label for="checktbd">TBD</label>
+						<input id="checktbd" type="checkbox" ng-model="f.tbd" />
+					</div>
+					<div>
+						<label for="checkrejected">Rejected</label>
+						<input id="checkrejected" type="checkbox" ng-model="f.rejected"/>
+					</div>
+					<div>
+						<label for="checkaccepted">Accepted</label>
+						<input id="checkaccepted" type="checkbox" ng-model="f.accepted"/>
+					</div>
+				</div>
+				<div class="group height">
+					<div>
+						<label for="checkteam">Team</label>
+						<input id="checkteam" type="checkbox" ng-model="f.team"/>
+					</div>
+					<div>
+						<label for="checktravel">Needs travel</label>
+						<input id="checktravel" type="checkbox" ng-model="f.travel"/>
+					</div>
+					<div>
+						<label for="checknoadult">Under-age</label>
+						<input id="checknoadult" type="checkbox" ng-model="f.noadult"/>
+					</div>
+					<div>
+						<label for="checknocode">No code</label>
+						<input id="checknocode" type="checkbox" ng-model="f.nocode"/>
+					</div>
+				</div>
 			</form>
 		</div>
 		<ul>

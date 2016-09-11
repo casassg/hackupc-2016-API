@@ -142,15 +142,21 @@ angular.module('controllers', [])
 
 	$scope.lastRated = lastRated;
 }])
-.controller('PeopleCtrl', ['$scope', 'Auth', 'ngNotify', 'API', 'people', 'PATHS', '$location',
-	function ($scope, Auth, ngNotify, API, people, PATHS, $location) {
+.controller('PeopleCtrl', ['$scope', 'Auth', 'ngNotify', 'API', 'people', 'PATHS', '$location', 'Storage',
+	function ($scope, Auth, ngNotify, API, people, PATHS, $location, Storage) {
 		$scope.people = people;
-		$scope.f ={
+		$scope.f = Storage.get("filter");
+
+		$scope.f = $scope.f || {
 			query: '',
 			accepted: false,
 			tbd: false,
 			onlyNewcomers: false,
-			rejected: false
+			rejected: false,
+			nocode: false,
+			travel: false,
+			noadult:false,
+			team:false
 		};
 		$scope.optClosed = true;
 
@@ -165,7 +171,11 @@ angular.module('controllers', [])
 		{
 			return $scope.f.accepted === false && 
 					$scope.f.tbd === false  &&
-					$scope.f.rejected === false;
+					$scope.f.rejected === false &&
+					$scope.f.nocode === false &&
+					$scope.f.noadult === false &&
+					$scope.f.travel === false &&
+					$scope.f.team === false;
 		}
 
 		function selectorMatch(element)
@@ -192,6 +202,34 @@ angular.module('controllers', [])
 					return true;
 				}
 			}
+			if($scope.f.team)
+			{
+				if(element.applyingAsAteam == '1')
+				{
+					return true;
+				}
+			}
+			if($scope.f.travel)
+			{
+				if(element.needTravelScholarship == '1')
+				{
+					return true;
+				}
+			}
+			if($scope.f.noadult)
+			{
+				if(element.adult != '1')
+				{
+					return true;
+				}
+			}
+			if($scope.f.nocode)
+			{
+				if(element.mlhAuthorization != '1')
+				{
+					return true;
+				}
+			}
 
 			return false;
 		}
@@ -202,6 +240,7 @@ angular.module('controllers', [])
 			return true;
 		}
 		$scope.viewPerson = function(id){
+			Storage.set("filter", $scope.f);
 			$location.path(PATHS.people+"/"+id);
 		};
 
