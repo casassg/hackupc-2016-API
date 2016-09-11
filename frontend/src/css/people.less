@@ -11,30 +11,51 @@
 		transition: margin-top 200ms ease;
 		&.closed
 		{
-			margin-top:-165px;
+			margin-top:-215px;
 		}
 	}
 	.none{
 		padding-left:10px;
 	}
-	fieldset
+	div.group, fieldset
 	{
 		border:none;
 		padding:0;
 		margin-bottom:10px;
+
 
 		input[type=search]
 		{
 			width:100%;
 		}
 
-		h3
+	}
+
+	h3
+	{
+		margin:0;
+		border-bottom:thin solid fadeout(@optionsColor, 20%);
+		margin-bottom:5px;
+	}
+
+	div.group
+	{
+		display:flex;
+		flex-wrap:wrap;
+		text-align:center;
+		max-width:500px;
+		div
 		{
-			margin:0;
-			border-bottom:thin solid fadeout(@optionsColor, 20%);
-			margin-bottom:5px;
+			flex:1 1 auto;
+		    white-space: nowrap;	
+		}
+
+		&.height
+		{
+			min-height:40px;
 		}
 	}
+
     ul
     {
 	    flex: 1 1 auto;

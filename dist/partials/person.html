@@ -41,10 +41,11 @@
 			</tr>
 		</table>
 		<div class="misc">
-				<div class="team" ng-if="person.applyingAsAteam == '1'">Team</div>
-				<div class="travel" ng-if="person.needTravelScholarship == '1'">Needs Travel</div>
-				<div class="newbie" ng-if="person.newbie == '1'">Newbie</div>
-				<div class="noadult" ng-if="person.adult != '1'">&lt;18</div>
+			<div class="nocode" ng-if="person.mlhAuthorization != '1'">DIDN'T ACCEPT THE CODE</div>
+			<div class="team" ng-if="person.applyingAsAteam == '1'">Team</div>
+			<div class="travel" ng-if="person.needTravelScholarship == '1'">Needs Travel</div>
+			<div class="newbie" ng-if="person.newbie == '1'">Newbie</div>
+			<div class="noadult" ng-if="person.adult != '1'">&lt;18</div>
 		</div>
 		<div class="teammates" ng-if="person.applyingAsAteam == '1' && person.teammatesName">
 			<h3>Team members</h3>
