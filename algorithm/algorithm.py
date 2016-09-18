@@ -14,12 +14,20 @@ def utf_8_encoder(unicode_csv_data):
 
 def is_appl_travel(appl, travel):
     data = json.loads(appl['data'])
+    try:
+        print data['needTravelScholarship']
+    except Exception:
+        print 'no needs travel scholarship'
+
+    print 'Needs travel?'
+    print 'needTravelScholarship' in data and int(data['needTravelScholarship'])
+    print 
     if travel:
 
         return 'needTravelScholarship' in data and int(data['needTravelScholarship']) 
 
     else:
-        return 'needTravelScholarship' not in data or int(data['needTravelScholarship'])
+        return 'needTravelScholarship' not in data or int(data['needTravelScholarship'])==0
 
 
 conn = sqlite3.connect('../backend/api/tmp/test.db')
