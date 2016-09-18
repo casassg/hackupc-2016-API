@@ -1,13 +1,24 @@
 import sqlite3
 import csv
 import sys
+import json
 
 ############# Number of people into this batch ##################
 batch_num = int(sys.argv[1])
+############# Is this a travel reimbursement batch ##############
+with_travel = int(sys.argv[2])
 
 def utf_8_encoder(unicode_csv_data):
     for line in unicode_csv_data:
         yield line.encode('utf-8')
+
+def is_appl_travel(appl, travel):
+    data = json.loads(appl['data'])
+    if travel:
+        return 'needTravelScholarship' in data and data['needTravelScholarship'] == 1
+    else:
+        return 'needTravelScholarship' not in data or data['needTravelScholarship'] == 0
+
 
 conn = sqlite3.connect('../backend/api/tmp/test.db')
 conn.row_factory = sqlite3.Row
@@ -30,7 +41,8 @@ for appl in conn.execute('SELECT * FROM applications'):
             avg = total_score/count
         else:
             avg = 0
-    if appl['state']=='tbd':
+
+    if appl['state']=='tbd' and is_appl_travel(appl,with_travel):
         judgements.append([app_id, avg, appl["name"].encode('utf-8'), appl["email"].encode('utf-8')])
 
 judgements = sorted(judgements, key=lambda judgement: -judgement[1])
